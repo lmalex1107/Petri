@@ -1,0 +1,13 @@
+package view;
+
+import java.awt.BorderLayout;
+
+import javax.swing.JPanel;
+
+public class SymbolPanel extends JPanel{
+	PetriGraph petrigraph;
+	
+	public SymbolPanel () {
+		this.petrigraph = petrigraph;
+	}
+}

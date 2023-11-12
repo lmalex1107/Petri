@@ -1,0 +1,58 @@
+package view;
+
+import java.awt.BorderLayout;
+import java.util.ArrayList;
+
+import javax.swing.*;
+
+import control.Control;
+import model.Arc;
+import model.Knot;
+
+public class GUI extends JFrame{
+	PetriGraph petrigraph;
+	
+	public JMenuItem oeffnen;
+	public JMenuItem neu_laden;
+	public JMenuItem analyse;
+	public JMenuItem beenden;
+
+	public GUI (Control control, ArrayList<Knot> knotlist, ArrayList<Arc> arclist) {
+		super("Alexander Adams q9264825");
+		this.petrigraph = petrigraph;
+		this.setSize(1000, 700);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setLayout(new BorderLayout());
+		
+		JMenuBar menubar = new JMenuBar();
+		JMenu datei = new JMenu("Datei");
+		oeffnen = new JMenuItem ("Öffnen");
+		oeffnen.addActionListener(control);
+		neu_laden = new JMenuItem ("Neu laden");
+		neu_laden.addActionListener(control);
+		analyse = new JMenuItem ("Analyse mehrerer Dateien");
+		analyse.addActionListener(control);
+		beenden = new JMenuItem ("Beenden");
+		beenden.addActionListener(control);
+		datei.add(oeffnen);
+		datei.add(neu_laden);
+		datei.add(analyse);
+		datei.add(beenden);
+		menubar.add(datei);
+		this.add(menubar, BorderLayout.NORTH);
+		TextPanel textpanel = new TextPanel();
+		this.add(textpanel, BorderLayout.SOUTH);
+		this.setVisible(true);
+	}
+	
+	public void open() {
+		JFileChooser jfilechooser = new JFileChooser();
+		jfilechooser.showOpenDialog(null);
+	}
+	
+	
+	public static void main (String args[]) {
+		GUI gui = new GUI(null, null, null);
+	}
+	
+}

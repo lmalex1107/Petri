@@ -1,0 +1,73 @@
+package view;
+
+
+import java.util.ArrayList;
+
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.MultiGraph;
+
+import model.*;
+
+public class PetriGraph extends MultiGraph {
+	
+	private static String CSS_FILE = "url(" + PetriGraph.class.getResource("/graph.css") + ")";	//Test
+	//private static String CSS_FILE = "/home/alex/Fernuni/Propra/Wi202021/ProPra-WS20-Demo/resources/graph.css";
+	
+	ArrayList<Knot> knotlist;
+	ArrayList<Arc> arclist;
+
+	public PetriGraph (ArrayList<Knot> knotlist, ArrayList<Arc> arclist) {
+		super("");
+		//this.addAttribute("ui.stylesheet", CSS_FILE);
+		this.knotlist = knotlist;
+		this.arclist = arclist;
+		loadGraph (this.knotlist, this.arclist);
+	}
+	
+	public void loadGraph(ArrayList<Knot> knotlist, ArrayList<Arc> arclist) {
+		//System.out.println("T E S T A++");
+		//System.out.println(CSS_FILE);
+		//System.out.print(PetriGraph.class.getResource("/graph.css"));
+		this.clear();
+		this.addAttribute("ui.stylesheet", CSS_FILE);
+		this.knotlist = knotlist;
+		this.arclist = arclist;
+		if (this.knotlist != null) {
+			for (int i = 0; i < knotlist.size(); i++) {
+				String label = new String();
+				String sortofnode = new String();
+				System.out.println("Einfügen der Knoten in den Graphen");
+				if (this.knotlist.get(i).getClass().toString().equals("class model.Place") == true) {
+					label = "[" + this.knotlist.get(i).getId() + "] " + this.knotlist.get(i).getName() + " <" + this.knotlist.get(i).getToken() + ">";
+					sortofnode = "Place";
+				}
+				else {
+					label = "[" + this.knotlist.get(i).getId() + "] " + this.knotlist.get(i).getName();
+					sortofnode = "Transition";
+				}
+				Node node = this.addNode(knotlist.get(i).getId());
+				node.addAttribute("ui.class", sortofnode);
+				node.addAttribute("ui.label", label);
+				node.addAttribute("xy", knotlist.get(i).getX(), knotlist.get(i).getY());
+			}
+		}
+		
+		if(this.arclist != null) {
+			System.out.println("Knoten mittels Kanten verbinden");
+			for (int i = 0; i < arclist.size(); i++) {
+				String label = new String();
+				label = "[" + this.arclist.get(i).getId() + "]";
+				Edge edge = this.addEdge(arclist.get(i).getId(), arclist.get(i).getSource(), arclist.get(i).getTarget(), true);
+				edge.addAttribute("ui.label", label);
+			}
+		}
+		
+	}
+	
+	public void changeGraph() {		//Das Petrinet durchlaufen und schauen, was sich verändert hat. Nur diese geänderten Stellen auch in der Derstellung verändern.
+		
+	}
+	
+	
+}

@@ -1,0 +1,117 @@
+package view;
+
+
+import java.util.ArrayList;
+
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Node;
+import org.graphstream.graph.implementations.MultiGraph;
+
+import model.*;
+
+public class PetriGraph extends MultiGraph {
+	
+	private static String CSS_FILE = "url(" + PetriGraph.class.getResource("/graph.css") + ")";	//Test
+	//private static String CSS_FILE = "/home/alex/Fernuni/Propra/Wi202021/ProPra-WS20-Demo/resources/graph.css";
+	
+	ArrayList<Knot> knotlist;
+	ArrayList<Arc> arclist;
+
+	public PetriGraph (ArrayList<Knot> knotlist, ArrayList<Arc> arclist) {
+		super("");
+		//this.addAttribute("ui.stylesheet", CSS_FILE);
+		this.knotlist = knotlist;
+		this.arclist = arclist;
+		loadGraph (this.knotlist, this.arclist);
+	}
+	
+	public void loadGraph(ArrayList<Knot> knotlist, ArrayList<Arc> arclist) {
+		//System.out.println("T E S T A++");
+		//System.out.println(CSS_FILE);
+		//System.out.print(PetriGraph.class.getResource("/graph.css"));
+		this.clear();
+		this.addAttribute("ui.stylesheet", CSS_FILE);
+		this.knotlist = knotlist;
+		this.arclist = arclist;
+		if (this.knotlist != null) {
+			for (int i = 0; i < knotlist.size(); i++) {
+				String label = new String();
+				String sortofnode = new String();
+				String Selection = new String();
+				String tokens = new String();
+				System.out.println("Einfügen der Knoten in den Graphen");
+				if (this.knotlist.get(i).getClass().toString().equals("class model.Place") == true) {
+					label = "[" + this.knotlist.get(i).getId() + "] " + this.knotlist.get(i).getName() + " <" + this.knotlist.get(i).getToken() + ">";
+					sortofnode = "Place";
+					
+				}
+				else {
+					label = "[" + this.knotlist.get(i).getId() + "] " + this.knotlist.get(i).getName();
+					sortofnode = "Transition";
+				}
+				if (this.knotlist.get(i).getSelection() == true) {
+					Selection = "selected";
+				}
+				else {
+					Selection = "unselected";
+				}
+				tokens = Integer.toString(this.knotlist.get(i).getToken());
+				
+				Node node = this.addNode(knotlist.get(i).getId());
+				node.addAttribute("ui.class", sortofnode);
+				node.addAttribute("ui.label", label);
+				node.addAttribute("id", this.knotlist.get(i).getId());
+				node.addAttribute("tokens", tokens);
+				node.addAttribute("xy", knotlist.get(i).getX(), knotlist.get(i).getY());
+			
+			}
+		}
+		
+		if(this.arclist != null) {
+			System.out.println("Knoten mittels Kanten verbinden");
+			for (int i = 0; i < arclist.size(); i++) {
+				String label = new String();
+				label = "[" + this.arclist.get(i).getId() + "]";
+				Edge edge = this.addEdge(arclist.get(i).getId(), arclist.get(i).getSource(), arclist.get(i).getTarget(), true);
+				edge.addAttribute("ui.label", label);
+			}
+		}
+		
+		
+	}
+	
+	public void changeGraph(ArrayList<Knot> knotlist) {		//Das Petrinet durchlaufen und schauen, was sich verändert hat. Nur diese geänderten Stellen auch in der Derstellung verändern.
+		this.knotlist = knotlist;
+		for (int i = 0; i < this.knotlist.size(); i++) {
+			if ((this.getNode(this.knotlist.get(i).getId()).getAttribute("ui.class") == "select") && (this.knotlist.get(i).getSelection() == false) && (this.knotlist.get(i).getClass().toString().equals("class model.Transition"))) {
+				this.getNode(this.knotlist.get(i).getId()).removeAttribute("ui.class");
+				this.getNode(this.knotlist.get(i).getId()).addAttribute("ui.class", "Transition");
+			}
+			if ((this.getNode(this.knotlist.get(i).getId()).getAttribute("ui.class") == "Transition") && (this.knotlist.get(i).getSelection() == true) && (this.knotlist.get(i).getClass().toString().equals("class model.Transition"))) {
+				this.getNode(this.knotlist.get(i).getId()).removeAttribute("ui.class");
+				this.getNode(this.knotlist.get(i).getId()).addAttribute("ui.class", "select");
+			}
+			
+			
+			//Änderungen der Markenzahl anzeigen lassen.
+			if (this.knotlist.get(i).getClass().toString().equals("class model.Place")) {
+				System.out.println("Gamma-Test I");
+				if (this.getNode(this.knotlist.get(i).getId()).getAttribute("tokens").equals(Integer.toString(this.knotlist.get(i).getToken()))){
+					System.out.println("Gamma-Test II");
+				}
+				else {
+					System.out.println("Gamma-Test III");
+					this.getNode(this.knotlist.get(i).getId()).removeAttribute("ui.label");
+					String newlabel = new String();
+					newlabel = "[" + this.knotlist.get(i).getId() + "] " + this.knotlist.get(i).getName() + " <" + this.knotlist.get(i).getToken() + ">";
+					this.getNode(this.knotlist.get(i).getId()).addAttribute("ui.label", newlabel);
+					this.getNode(this.knotlist.get(i).getId()).removeAttribute("tokens");
+					this.getNode(this.knotlist.get(i).getId()).addAttribute("tokens", Integer.toString(this.knotlist.get(i).getToken()));
+				}
+			}
+			
+		}
+	}
+	
+	
+}

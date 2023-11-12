@@ -1,0 +1,31 @@
+package control;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+import model.Arc;
+import model.Knot;
+import view.GUI;
+import view.PetriGraph;
+
+public class Control implements ActionListener{
+	ArrayList<Knot> knotlist = null;
+	ArrayList<Arc> arclist = null;
+	GUI gui = new GUI(this, knotlist, arclist);
+	
+	@Override
+	public void actionPerformed(ActionEvent ae) {
+		if (ae.getSource() == gui.oeffnen) {
+			gui.open();
+		}
+		
+	}
+	
+	public static void main (String args[]) {
+		Control control = new Control();
+		
+	}
+	
+	
+}

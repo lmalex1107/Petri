@@ -1,0 +1,160 @@
+package view;
+
+import java.awt.BorderLayout;
+import java.io.File;
+import java.util.ArrayList;
+
+import javax.swing.*;
+
+import org.graphstream.graph.Node;
+import org.graphstream.ui.swingViewer.ViewPanel;
+import org.graphstream.ui.view.View;
+import org.graphstream.ui.view.Viewer;
+import org.graphstream.ui.view.ViewerPipe;
+
+import control.Control;
+import control.file.FileHandling;
+import control.file.Parser;
+import model.Arc;
+import model.Knot;
+
+public class GUI extends JFrame{
+	File xmlfile;
+	
+	PetriGraph petrigraph;
+	PetriGraph lastpetrigraph;
+	
+	public JMenuItem oeffnen;
+	public JMenuItem neu_laden;
+	public JMenuItem analyse;
+	public JMenuItem beenden;
+	
+	ArrayList<Knot> knotlist;
+	ArrayList<Arc> arclist;
+	
+	Viewer viewer;
+	ViewPanel viewpanel;
+	public ViewerPipe viewerpipe;
+	
+	public CenterPanel centerpanel;
+
+	public GUI (Control control, ArrayList<Knot> knotlist, ArrayList<Arc> arclist, PetriGraph petrigraph) {
+		super("Alexander Adams q9264825");
+		this.knotlist = knotlist;
+		this.arclist = arclist;
+		this.petrigraph = petrigraph;
+		
+		//File pnmlfile = new File("/home/alex/Fernuni/Propra/Wi202021/ProPra-WS20-Basis/Beispiele/152-B1-N06-A06-Example03v1.pnml"); //Test
+		//Parser parser = new Parser(pnmlfile);
+		//parser.initParser();
+		//parser.parse();
+		//this.knotlist = parser.getKnotList();
+		//this.arclist = parser .getArcList();
+		//petrigraph = new PetriGraph(this.knotlist, this.arclist);
+		
+		System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+		
+		this.setSize(1000, 700);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setLayout(new BorderLayout());
+		lastpetrigraph = null;
+		
+		JMenuBar menubar = new JMenuBar();
+		JMenu datei = new JMenu("Datei");
+		oeffnen = new JMenuItem ("Öffnen");
+		oeffnen.addActionListener(control);
+		neu_laden = new JMenuItem ("Neu laden");
+		neu_laden.addActionListener(control);
+		analyse = new JMenuItem ("Analyse mehrerer Dateien");
+		analyse.addActionListener(control);
+		beenden = new JMenuItem ("Beenden");
+		beenden.addActionListener(control);
+		datei.add(oeffnen);
+		datei.add(neu_laden);
+		datei.add(analyse);
+		datei.add(beenden);
+		menubar.add(datei);
+		this.add(menubar, BorderLayout.NORTH);
+		
+		
+		TextPanel textpanel = new TextPanel();
+		
+		//File pnmlfile = new File("/home/alex/Fernuni/Propra/Wi202021/ProPra-WS20-Basis/Beispiele/113-B1-N03-A02-EineStelleZweiMarkenEineTransition.pnml");
+		//Parser pnmlParser = new Parser(pnmlfile);
+		//pnmlParser.initParser();
+		//pnmlParser.parse();
+		//petrigraph = new PetriGraph(pnmlParser.getKnotList(), pnmlParser.getArcList());
+		//System.out.println(System.identityHashCode( petrigraph ));
+		
+		
+		
+		
+		viewer = new Viewer(petrigraph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+		viewer.disableAutoLayout();
+		viewpanel = viewer.addDefaultView(false);
+		viewerpipe = viewer.newViewerPipe();
+		viewerpipe.addAttributeSink(petrigraph);
+		viewerpipe.addViewerListener(control);
+		//this.add(viewpanel, BorderLayout.CENTER);
+		
+		
+		
+		centerpanel = new CenterPanel(petrigraph);
+		this.add(centerpanel, BorderLayout.CENTER);
+		
+		this.add(textpanel, BorderLayout.SOUTH);
+		this.setVisible(true);
+	}
+	
+	public PetriGraph open(PetriGraph petrigraph) {
+		//this.petrigraph = petrigraph;
+		//lastpetrigraph = this.petrigraph;
+		FileHandling filehandling = new FileHandling();
+		xmlfile = filehandling.getFile();
+		if (xmlfile != null) {
+			System.out.println("Test 1");
+			Parser parser = new Parser (xmlfile);
+			parser.initParser();
+			parser.parse();
+			this.knotlist = parser.getKnotList();
+			this.arclist = parser.getArcList();
+			petrigraph.loadGraph(this.knotlist, this.arclist);
+			//petrigraph = new PetriGraph(this.knotlist, this.arclist);
+			//this.centerpanel.setPetriGraph(petrigraph);
+			
+			//this.viewerpipe.pump();
+			System.out.println(System.identityHashCode( petrigraph ));	//Test
+		}
+		return petrigraph;
+	}
+	
+	public ArrayList<Knot> getKnotList(){
+		return this.knotlist;
+	}
+	
+	public ArrayList<Arc> getArcList(){
+		return this.arclist;
+	}
+	
+	public PetriGraph getPetriGraph() {
+		return this.petrigraph;
+	}
+	
+	public void load_new() {
+		
+	}
+	
+	public void analyse() {
+		
+	}
+	
+	public void exit( ) {
+		System.exit(0);
+	}
+	
+	
+	public static void main (String args[]) {
+		GUI gui = new GUI(null, null, null, null);
+	}
+	
+}

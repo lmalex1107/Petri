@@ -1,0 +1,31 @@
+package view;
+
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+import org.graphstream.ui.swingViewer.ViewPanel;
+import org.graphstream.ui.view.View;
+import org.graphstream.ui.view.Viewer;
+import org.graphstream.ui.view.ViewerPipe;
+
+public class PetriPanel extends JPanel{
+
+	public PetriPanel (PetriGraph petrigraph) {
+		if (petrigraph != null) {
+			System.out.println("PetriPanelTest");
+			System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+			Viewer viewer = new Viewer(petrigraph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+			View view = viewer.addDefaultView(false);
+			ViewerPipe viewerpipe = viewer.newViewerPipe();
+			ViewPanel viewpanel = viewer.addDefaultView(false);
+			this.add(viewpanel);
+			petrigraph.display();
+		}
+		else {
+			System.out.println("Fehler!");
+		}
+	}
+	
+	
+}

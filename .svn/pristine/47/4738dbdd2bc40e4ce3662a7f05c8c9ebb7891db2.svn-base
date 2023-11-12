@@ -1,0 +1,17 @@
+package model;
+
+public class Place extends Node {
+	boolean initialMarking = false;
+	
+	public Place(String id) {
+		super(id);
+	}
+	
+	public boolean getInitialMarking () {
+		return this.initialMarking;
+	}
+	
+	public void setInitialMarking (boolean initialMarking) {
+		this.initialMarking = initialMarking;
+	}
+}

@@ -1,0 +1,15 @@
+package view;
+
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+public class TextPanel extends JPanel{
+
+	
+	
+
+	public void paint (Graphics g) {
+		g.drawString("Text-Test", 10, 10);
+	}
+}

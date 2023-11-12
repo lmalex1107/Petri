@@ -1,0 +1,108 @@
+import java.io.File;
+
+import control.file.Parser;
+import model.PetriNet;
+
+public class Test {
+
+	
+	public static void main (String args[]) {
+		if (args.length > 0) {
+			File pnmlDatei = new File(args[0]);
+			if (pnmlDatei.exists()) {
+				Parser pnmlParser = new Parser(pnmlDatei);
+				pnmlParser.initParser();
+				pnmlParser.parse();
+				for (int i = 0; i < pnmlParser.getKnotList().size(); i++) {
+					System.out.println(pnmlParser.getKnotList().get(i).getId());
+					System.out.println(pnmlParser.getKnotList().get(i).getName());
+					System.out.println(pnmlParser.getKnotList().get(i).getX());
+					System.out.println(pnmlParser.getKnotList().get(i).getY());
+					System.out.println("------");
+				}
+				
+				for (int j = 0; j < pnmlParser.getArcList().size(); j++) {
+					System.out.println(pnmlParser.getArcList().get(j).getId());
+					System.out.println(pnmlParser.getArcList().get(j).getSource());
+					System.out.println(pnmlParser.getArcList().get(j).getTarget());
+					System.out.println("------");
+				}
+				
+				PetriNet petrinet = new PetriNet (pnmlParser.getKnotList(), pnmlParser.getArcList());
+				for (int i = 0; i < petrinet.getcompleteKnotList().size(); i++) {
+					System.out.println("");
+					System.out.println(petrinet.getcompleteKnotList().get(i).getId());
+					System.out.println("Vorgänger: ");
+					if (petrinet.getcompleteKnotList().get(i).getPredecessorList().size() > 0) {
+						for (int j = 0; j < petrinet.getcompleteKnotList().get(i).getPredecessorList().size(); j++) {
+							System.out.println(petrinet.getcompleteKnotList().get(i).getPredecessorList().get(j).getId());
+						}
+					
+					}
+					else {
+						System.out.println ("-----");
+					}
+					System.out.println("Nachfolger: ");
+					if (petrinet.getcompleteKnotList().get(i).getSuccessorList().size() > 0) {
+						for (int k = 0; k < petrinet.getcompleteKnotList().get(i).getSuccessorList().size(); k++) {
+							System.out.println(petrinet.getcompleteKnotList().get(i).getSuccessorList().get(k).getId());
+						}
+					}
+					else {
+						System.out.println("-----");
+					}
+				}
+				
+				petrinet.firing_all(petrinet.getMarking());
+				System.out.println("Alpha-Test");
+				System.out.println("Schalten möglich? " + petrinet.isfiringpossible());
+				System.out.println("Sortierte Stellen-Liste");
+				System.out.println(petrinet.getPlacelist().size());
+				for (int l = 0; l < petrinet.getPlacelist().size(); l++) {
+					System.out.println(petrinet.getPlacelist().get(l).getId() + ": " + petrinet.getMarking()[l]);
+				}
+				
+				System.out.println("Schalten möglich? " + petrinet.isfiringpossible());
+				for (int j = 0; j < petrinet.getTransitionlist().size(); j++) {
+					System.out.println("Schalter: " + petrinet.getTransitionlist().get(j).getId() + " " + (petrinet.hasenoughtokens(petrinet.getTransitionlist().get(j).getId())));
+				}
+				System.out.println("Schalten von 't2'");
+				petrinet.firing("t2");
+				for (int l = 0; l < petrinet.getPlacelist().size(); l++) {
+					System.out.println(petrinet.getPlacelist().get(l).getId() + ": " + petrinet.getMarking()[l]);
+				}
+				for (int j = 0; j < petrinet.getTransitionlist().size(); j++) {
+					System.out.println("Schalter: " + petrinet.getTransitionlist().get(j).getId() + " " + (petrinet.hasenoughtokens(petrinet.getTransitionlist().get(j).getId())));
+				}
+				
+				System.out.println("Schalten möglich? " + petrinet.isfiringpossible());
+				System.out.println("Schalten von 't2'");
+				petrinet.firing("t2");
+				for (int l = 0; l < petrinet.getPlacelist().size(); l++) {
+					System.out.println(petrinet.getPlacelist().get(l).getId() + ": " + petrinet.getMarking()[l]);
+				}
+				for (int j = 0; j < petrinet.getTransitionlist().size(); j++) {
+					System.out.println("Schalter: " + petrinet.getTransitionlist().get(j).getId() + " " + (petrinet.hasenoughtokens(petrinet.getTransitionlist().get(j).getId())));
+				}
+				
+				System.out.println("Schalten möglich? " + petrinet.isfiringpossible());
+				System.out.println("Schalten von 't1'");
+				petrinet.firing("t1");
+				for (int l = 0; l < petrinet.getPlacelist().size(); l++) {
+					System.out.println(petrinet.getPlacelist().get(l).getId() + ": " + petrinet.getMarking()[l]);
+				}
+				for (int j = 0; j < petrinet.getTransitionlist().size(); j++) {
+					System.out.println("Schalter: " + petrinet.getTransitionlist().get(j).getId() + " " + (petrinet.hasenoughtokens(petrinet.getTransitionlist().get(j).getId())));
+				}
+				
+				
+			} else {
+				System.err.println("Die Datei " + pnmlDatei.getAbsolutePath()
+						+ " wurde nicht gefunden!");
+			}
+		} else {
+			System.out.println("Bitte eine Datei als Parameter angeben!");
+		}
+	}
+	
+}

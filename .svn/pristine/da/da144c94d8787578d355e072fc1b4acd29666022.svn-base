@@ -1,0 +1,141 @@
+package control.file;
+
+import propra.pnml.*;
+import model.*;
+import java.io.File;
+import java.util.ArrayList;
+
+public class Parser extends PNMLWopedParser {
+	
+	ArrayList<Knot> knotlist;
+	ArrayList<Arc> arclist;
+	//Transition transition;
+	//Place place;
+	Knot knot;
+	Arc arc;
+	
+	public Parser(final File pnml) {
+		super(pnml);
+		knotlist = new ArrayList<Knot>();
+		arclist = new ArrayList<Arc>();
+	}
+	
+	public ArrayList<Knot> getKnotList(){
+		return this.knotlist;
+	}
+	
+	public ArrayList<Arc> getArcList(){
+		return arclist;
+	}
+	
+	@Override
+	public void newTransition (final String id) {
+		knot = new Transition(id);
+		System.out.println("ID: " + id);
+	}
+	
+	@Override
+	public void newPlace (final String id) {
+		knot = new Place(id);
+		System.out.println("ID: " + id);
+	}
+	
+	@Override
+	public void newArc (final String id, final String source, final String target) {
+		arc = new Arc(id);
+		arc.setSource(source);
+		arc.setTarget(target);
+		arclist.add(arc);
+	}
+	
+	@Override
+	public void setPosition(final String id, final String x, final String y) {
+		knot.setX(Integer.parseUnsignedInt(x));
+		knot.setY(Integer.parseUnsignedInt(y));
+		System.out.println("Position x: " + x);
+		System.out.println("Position y: " + y);
+		knotlist.add(knot);
+	}
+	
+	@Override
+	public void setName(final String id, final String name){
+		knot.setName(name);
+		System.out.println("Name: " + name);
+	}
+	
+	@Override
+	public void setTokens(final String id, final String tokens) {
+		
+		
+	}
+	
+	
+	public static void main(final String[] args) {
+		if (args.length > 0) {
+			File pnmlDatei = new File(args[0]);
+			if (pnmlDatei.exists()) {
+				Parser pnmlParser = new Parser(pnmlDatei);
+				pnmlParser.initParser();
+				pnmlParser.parse();
+				for (int i = 0; i < pnmlParser.getKnotList().size(); i++) {
+					System.out.println(pnmlParser.getKnotList().get(i).getId());
+					System.out.println(pnmlParser.getKnotList().get(i).getName());
+					System.out.println(pnmlParser.getKnotList().get(i).getX());
+					System.out.println(pnmlParser.getKnotList().get(i).getY());
+					System.out.println("------");
+				}
+				
+				for (int j = 0; j < pnmlParser.getArcList().size(); j++) {
+					System.out.println(pnmlParser.getArcList().get(j).getId());
+					System.out.println(pnmlParser.getArcList().get(j).getSource());
+					System.out.println(pnmlParser.getArcList().get(j).getTarget());
+					System.out.println("------");
+				}
+				
+				PetriNet petrinet = new PetriNet (pnmlParser.getKnotList(), pnmlParser.getArcList());
+				for (int i = 0; i < petrinet.getcompleteKnotList().size(); i++) {
+					System.out.println("");
+					System.out.println(petrinet.getcompleteKnotList().get(i).getId());
+					System.out.println("Vorgänger: ");
+					if (petrinet.getcompleteKnotList().get(i).getPredecessorList().size() > 0) {
+						for (int j = 0; j < petrinet.getcompleteKnotList().get(i).getPredecessorList().size(); j++) {
+							System.out.println(petrinet.getcompleteKnotList().get(i).getPredecessorList().get(j).getId());
+						}
+					
+					}
+					else {
+						System.out.println ("-----");
+					}
+					System.out.println("Nachfolger: ");
+					if (petrinet.getcompleteKnotList().get(i).getSuccessorList().size() > 0) {
+						for (int k = 0; k < petrinet.getcompleteKnotList().get(i).getSuccessorList().size(); k++) {
+							System.out.println(petrinet.getcompleteKnotList().get(i).getSuccessorList().get(k).getId());
+						}
+					}
+					else {
+						System.out.println("-----");
+					}
+				}
+				
+				System.out.println("Sortierte Stellen-Liste");
+				System.out.println(petrinet.getPlacelist().size());
+				for (int l = 0; l < petrinet.getPlacelist().size(); l++) {
+					System.out.println(petrinet.getPlacelist().get(l).getId());
+				}
+				
+				petrinet.firing("t1");
+				
+			} else {
+				System.err.println("Die Datei " + pnmlDatei.getAbsolutePath()
+						+ " wurde nicht gefunden!");
+			}
+		} else {
+			System.out.println("Bitte eine Datei als Parameter angeben!");
+		}
+		
+		
+	}
+	
+	
+	
+}

@@ -1,0 +1,31 @@
+package model;
+
+public class Place extends Knot {
+	private boolean initialMarking = false;
+	private int token = 0;
+	
+	public Place(String id) {
+		super(id);
+	}
+	
+	public boolean getInitialMarking () {
+		return this.initialMarking;
+	}
+	
+	public void setInitialMarking (boolean initialMarking) {
+		this.initialMarking = initialMarking;
+	}
+	
+	public int getToken() {
+		return this.token;
+	}
+	
+	public void plusToken(int token) {
+		this.token += token;
+	}
+	
+	public static void main(String args[]) {
+		Knot knot = new Knot("");
+		System.out.println(knot.getClass().toString());
+	}
+}

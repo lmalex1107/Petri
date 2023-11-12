@@ -1,0 +1,102 @@
+package model;
+
+import java.util.ArrayList;
+
+public class ERKnot {
+
+	private int[] Marking;
+	private String id;
+	private ArrayList<ERKnot> predecessor = null;
+	private ArrayList<ERKnot> successor = null;
+	private String label;
+	private boolean PartOfInfinityPath = false;
+	private int knot_mx = 0;			//0 = kein besonderer Knoten, 1 = m - Knoten, 2 = m' - Knoten
+	private boolean initial_knot = false;
+	private boolean Selection;
+	
+	public ERKnot(int[] Marking) {
+		this.Marking = Marking;
+		this.label = MarkingToString(Marking);
+		predecessor = new ArrayList<ERKnot>();
+		successor = new ArrayList<ERKnot>();
+		
+	}
+	
+	public void setInitialKnot (boolean b) {
+		this.initial_knot = b;
+	}
+	
+	public boolean getInitialKnot () {
+		return this.initial_knot;
+	}
+	
+	public boolean getSelection () {
+		return this.Selection;
+	}
+	
+	public void setSelection (boolean b) {
+		this.Selection = b;
+	}
+	
+	public static String MarkingToString(int[] Marking) {
+		String label = "(";
+		for (int i = 0; i < Marking.length; i++) {
+			label = label + Integer.toString(Marking[i]);
+			label = label + "|";
+		}
+		label = label + ")";
+		return label;
+	}
+	
+	public String getLabel() {
+		return this.label;
+	}
+	
+	public String getId() {
+		return this.label;
+	}
+	
+	public int[] getMarking() {
+		return this.Marking;
+	}
+	
+	public void setPredecessor(ERKnot erknot) {
+		this.predecessor.add(erknot);
+	}
+	
+	public ArrayList<ERKnot> getPredecessor(){
+		return this.predecessor;
+	}
+	
+	public void setSuccessor(ERKnot erknot) {
+		this.successor.add(erknot);
+	}
+	
+	public ArrayList<ERKnot> getSuccessor(){
+		return this.successor;
+	}
+	
+	public boolean isPartOfInfinityPath() {
+		return PartOfInfinityPath;
+	}
+	
+	public void setPartOfInfinityPath(boolean b) {
+		this.PartOfInfinityPath = b;
+	}
+	
+	public String Testmarking() {
+		String temp = "";
+		for (int i = 0; i < this.Marking.length; i++) {
+			temp = temp + " " + this.Marking[i];
+		}
+		return temp;
+	}
+	
+	public int getknot_mx () {
+		return knot_mx;
+	}
+	
+	public void setknot_mx (int v) {
+		this.knot_mx = v;
+	}
+}

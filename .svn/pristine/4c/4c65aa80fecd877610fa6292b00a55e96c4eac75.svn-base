@@ -1,0 +1,87 @@
+package control;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import javax.swing.JTextArea;
+
+import control.file.Parser;
+import model.Arc;
+import model.Knot;
+import model.PetriNet;
+
+public class Analyse {
+	
+	ArrayList<String> textlist;
+	File[] xmlfiles;
+	File xmlfile;
+	
+	ArrayList<String> SolutionStrings;
+	JTextArea textarea;
+	
+	public Analyse(File[] xmlfiles, JTextArea textarea) {
+		this.xmlfiles = xmlfiles;
+		this.textarea = textarea;
+		Arrays.sort(xmlfiles);
+	}
+	
+	public Analyse (File xmlfile, JTextArea textarea) {
+		this.xmlfile = xmlfile;
+		this.textarea = textarea;
+	}
+	
+	
+	public void analyse_ALL() {
+		
+		for (int i = 0; i < xmlfiles.length; i++) {
+			System.out.println("         ++++++++--------+++++++");
+			System.out.println(xmlfiles[i].getName() + "  started...");
+			String startString = new String (xmlfiles[i].getName() + "    wird analysiert \n");
+			this.textarea.append(startString);
+			Parser parser = new Parser (xmlfiles[i]);
+			parser.initParser();
+			parser.parse();
+			ArrayList<Knot> knotlist = parser.getKnotList();
+			ArrayList<Arc> arclist = parser.getArcList();
+			PetriNet petrinet = new PetriNet(knotlist, arclist);
+			petrinet.firing_all(petrinet.getMarking());
+			String SolutionString = new String("");
+			if (petrinet.isInfinity() == true) {
+				SolutionString = SolutionString + xmlfiles[i].getName() + " ja";
+				int numberofknots = petrinet.getERNet().getNumberOfKnots();
+				int numberofarcs = petrinet.getERNet().getNumberOfArcs();
+				SolutionString = SolutionString + " " + numberofknots + " / " + numberofarcs + "\n";
+				System.out.println(SolutionString);
+			}
+			else {
+				SolutionString = SolutionString + xmlfiles[i].getName() + "   nein \n";
+				System.out.println(SolutionString);
+			}
+			
+			this.textarea.append(SolutionString);
+			this.textarea.append("\n");
+		}
+		
+		
+	}
+	
+	public boolean analyse_ONE() {
+		
+		Parser parser = new Parser (xmlfile);
+		parser.initParser();
+		parser.parse();
+		ArrayList<Knot> knotlist = parser.getKnotList();
+		ArrayList<Arc> arclist = parser.getArcList();
+		PetriNet petrinet = new PetriNet(knotlist, arclist);
+		petrinet.firing_all(petrinet.getMarking());
+		return petrinet.isInfinity();
+	}
+	
+	
+	public ArrayList<String> getSolutionStrings () {
+		return this.SolutionStrings;
+	}
+	
+	
+}

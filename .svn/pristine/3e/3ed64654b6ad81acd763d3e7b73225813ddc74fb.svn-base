@@ -1,0 +1,257 @@
+package view;
+
+import java.awt.BorderLayout;
+import java.io.File;
+import java.util.ArrayList;
+
+import javax.swing.*;
+
+import org.graphstream.graph.Node;
+import org.graphstream.ui.swingViewer.ViewPanel;
+import org.graphstream.ui.view.View;
+import org.graphstream.ui.view.Viewer;
+import org.graphstream.ui.view.ViewerPipe;
+
+import control.Control;
+import control.file.FileHandling;
+import control.file.MultipleFileHandling;
+import control.file.Parser;
+import model.Arc;
+import model.Knot;
+
+public class GUI extends JFrame{
+	File xmlfile;
+	
+	PetriGraph petrigraph;
+	PetriGraph lastpetrigraph;
+	
+	Erreichbarkeitsgraph ergraph;
+	
+	public JMenuItem oeffnen;
+	public JMenuItem neu_laden;
+	public JMenuItem analyse;
+	public JMenuItem beenden;
+	
+	ArrayList<Knot> knotlist;
+	ArrayList<Arc> arclist;
+	
+	Viewer viewer;
+	ViewPanel viewpanel;
+	public ViewerPipe viewerpipe;
+	
+	Viewer erviewer;
+	ViewPanel erviewpanel;
+	ViewerPipe erviewerpipe;
+	
+	
+	
+	public JPanel centerpanel;
+	public JPanel textpanel;
+	public JSplitPane graphpanel;
+	public JPanel symbolpanel;
+	public JPanel petripanel;
+	public JPanel erpanel;
+	public JScrollPane scrollpane;
+	public JTextArea textarea;
+	public JSplitPane mainpanel;
+
+	public JButton schalten;
+
+	public GUI (Control control, ArrayList<Knot> knotlist, ArrayList<Arc> arclist, PetriGraph petrigraph, Erreichbarkeitsgraph ergraph) {
+		super("Alexander Adams q9264825");
+		this.knotlist = knotlist;
+		this.arclist = arclist;
+		this.petrigraph = petrigraph;
+		this.ergraph = ergraph;
+		
+		//File pnmlfile = new File("/home/alex/Fernuni/Propra/Wi202021/ProPra-WS20-Basis/Beispiele/152-B1-N06-A06-Example03v1.pnml"); //Test
+		//Parser parser = new Parser(pnmlfile);
+		//parser.initParser();
+		//parser.parse();
+		//this.knotlist = parser.getKnotList();
+		//this.arclist = parser .getArcList();
+		//petrigraph = new PetriGraph(this.knotlist, this.arclist);
+		
+		System.setProperty("org.graphstream.ui.renderer", "org.graphstream.ui.j2dviewer.J2DGraphRenderer");
+		
+		this.setSize(1000, 700);
+		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		this.setLayout(new BorderLayout());
+		lastpetrigraph = null;
+		
+		JMenuBar menubar = new JMenuBar();
+		JMenu datei = new JMenu("Datei");
+		oeffnen = new JMenuItem ("Öffnen");
+		oeffnen.addActionListener(control);
+		neu_laden = new JMenuItem ("Neu laden");
+		neu_laden.addActionListener(control);
+		analyse = new JMenuItem ("Analyse mehrerer Dateien");
+		analyse.addActionListener(control);
+		beenden = new JMenuItem ("Beenden");
+		beenden.addActionListener(control);
+		datei.add(oeffnen);
+		datei.add(neu_laden);
+		datei.add(analyse);
+		datei.add(beenden);
+		menubar.add(datei);
+		this.add(menubar, BorderLayout.NORTH);
+		
+		
+		
+		
+		//File pnmlfile = new File("/home/alex/Fernuni/Propra/Wi202021/ProPra-WS20-Basis/Beispiele/113-B1-N03-A02-EineStelleZweiMarkenEineTransition.pnml");
+		//Parser pnmlParser = new Parser(pnmlfile);
+		//pnmlParser.initParser();
+		//pnmlParser.parse();
+		//petrigraph = new PetriGraph(pnmlParser.getKnotList(), pnmlParser.getArcList());
+		//System.out.println(System.identityHashCode( petrigraph ));
+		
+		
+		
+		
+		viewer = new Viewer(petrigraph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+		viewer.disableAutoLayout();
+		viewpanel = viewer.addDefaultView(false);
+		viewpanel.addMouseListener(control);
+		viewerpipe = viewer.newViewerPipe();
+		viewerpipe.addAttributeSink(petrigraph);
+		viewerpipe.addViewerListener(control);
+		//this.add(viewpanel, BorderLayout.CENTER);
+		
+		petripanel = new JPanel();
+		petripanel.setLayout(new BorderLayout());
+		petripanel.add(viewpanel, BorderLayout.CENTER);
+		
+		erviewer = new Viewer(ergraph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+		erviewer.disableAutoLayout();
+		erviewpanel = erviewer.addDefaultView(false);
+		erviewpanel.addMouseListener(control);
+		erviewerpipe = erviewer.newViewerPipe();
+		erviewerpipe.addAttributeSink(ergraph);
+		erviewerpipe.addViewerListener(control);
+		
+		erpanel = new JPanel();
+		erpanel.setLayout(new BorderLayout());
+		erpanel.add(erviewpanel, BorderLayout.CENTER);
+		
+		graphpanel = new JSplitPane();
+		graphpanel.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		graphpanel.setDividerLocation(50);
+		graphpanel.setLeftComponent(petripanel);
+		graphpanel.setRightComponent(erpanel);
+		
+		schalten = new JButton("Schalten"); 
+		schalten.addActionListener(control);
+		symbolpanel = new JPanel();
+		symbolpanel.add(schalten);
+		
+		centerpanel = new JPanel();
+		centerpanel.setLayout(new BorderLayout());
+		centerpanel.add(symbolpanel, BorderLayout.NORTH);
+		centerpanel.add(graphpanel, BorderLayout.CENTER);
+		
+		
+		textpanel = new JPanel();
+		textpanel.setLayout(new BorderLayout());
+		textarea = new JTextArea(); 
+		textarea.setLineWrap(true);
+		textarea.append("TEST");
+		scrollpane = new JScrollPane(textarea);
+		textpanel.add(scrollpane, BorderLayout.CENTER);
+		
+		mainpanel = new JSplitPane();
+		mainpanel.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		mainpanel.setTopComponent(centerpanel);
+		mainpanel.setBottomComponent(textpanel);
+		
+		//this.add(centerpanel, BorderLayout.CENTER);
+		//this.add(textpanel, BorderLayout.SOUTH);
+		this.add(mainpanel, BorderLayout.CENTER);
+		
+		
+		this.setVisible(true);
+		
+		
+	}
+	
+	public PetriGraph open(PetriGraph petrigraph) {
+		//this.petrigraph = petrigraph;
+		//lastpetrigraph = this.petrigraph;
+		FileHandling filehandling = new FileHandling();
+		xmlfile = filehandling.getFile();
+		if (xmlfile != null) {
+			System.out.println("Test 1");
+			Parser parser = new Parser (xmlfile);
+			parser.initParser();
+			parser.parse();
+			this.knotlist = parser.getKnotList();
+			this.arclist = parser.getArcList();
+			petrigraph.loadGraph(this.knotlist, this.arclist);
+			//petrigraph = new PetriGraph(this.knotlist, this.arclist);
+			//this.centerpanel.setPetriGraph(petrigraph);
+			
+			//this.viewerpipe.pump();
+			System.out.println(System.identityHashCode( petrigraph ));	//Test
+		}
+		return petrigraph;
+	}
+	
+	public File[] analyse() {
+		File[] xmlfiles = null;
+		MultipleFileHandling multiplefilehandling = new MultipleFileHandling();
+		xmlfiles = multiplefilehandling.getFiles();
+		return xmlfiles;
+	}
+	
+	public PetriGraph reopen(PetriGraph petrigraph) {
+		if (xmlfile != null) {
+			System.out.println("Test 1");
+			Parser parser = new Parser (xmlfile);
+			parser.initParser();
+			parser.parse();
+			this.knotlist = parser.getKnotList();
+			this.arclist = parser.getArcList();
+			
+			//petrigraph = new PetriGraph(this.knotlist, this.arclist);
+			//this.centerpanel.setPetriGraph(petrigraph);
+			
+			//this.viewerpipe.pump();
+			System.out.println(System.identityHashCode( petrigraph ));	//Test
+		}
+		return petrigraph;
+	}
+	
+	public ArrayList<Knot> getKnotList(){
+		return this.knotlist;
+	}
+	
+	public ArrayList<Arc> getArcList(){
+		return this.arclist;
+	}
+	
+	public PetriGraph getPetriGraph() {
+		return this.petrigraph;
+	}
+	
+	public void load_new() {
+		
+	}
+	
+	
+	
+	public void exit( ) {
+		System.exit(0);
+	}
+	
+	public void pump() {
+		if (viewerpipe != null) {
+			viewerpipe.pump();
+		}
+	}
+	
+	
+	public static void main (String args[]) {
+		GUI gui = new GUI(null, null, null, null, null);
+	}
+	
+}

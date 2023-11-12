@@ -1,0 +1,197 @@
+package control;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.File;
+import java.util.ArrayList;
+
+import javax.swing.JDialog;
+
+import org.graphstream.ui.view.ViewerListener;
+
+import model.Arc;
+import model.Erreichbarkeitsnet;
+import model.Knot;
+import model.PetriNet;
+import view.CenterPanel;
+import view.Erreichbarkeitsgraph;
+import view.GUI;
+import view.GraphPanel;
+import view.PetriGraph;
+import view.PetriPanel;
+import view.SymbolPanel;
+import view.TextPanel;
+
+public class Control implements ActionListener, ViewerListener, MouseListener{
+	ArrayList<Knot> knotlist = null;
+	ArrayList<Arc> arclist = null;
+	GUI gui;
+	PetriGraph petrigraph = null;
+	PetriNet petrinet = null;
+	Erreichbarkeitsnet ernet = null;
+	Erreichbarkeitsgraph ergraph = null;
+	
+	File[] xmlfiles = null;
+	File xmlfile = null; 
+	
+	public Control () {
+		petrigraph = new PetriGraph(knotlist, arclist);
+		ergraph = new Erreichbarkeitsgraph();
+		
+		gui = new GUI(this, knotlist, arclist, petrigraph, ergraph);
+		
+		System.out.println(System.identityHashCode( petrigraph ));			//Test
+		
+	
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent ae) {
+		if (ae.getSource() == gui.oeffnen) {
+			this.petrigraph = gui.open(this.petrigraph);
+			this.xmlfile = gui.getXmlFile();
+			this.knotlist = gui.getKnotList();
+			this.arclist = gui.getArcList();
+			this.petrinet = new PetriNet(this.knotlist, this.arclist);	
+			this.ernet = this.petrinet.getERNet(); //Übergabe des Petrinetzes an die Klasse zur
+			this.ergraph.addKnot(this.ernet.getERknotlist(), this.ernet.getERArclist());						//Berechnung des Erreichbarkeitsgraphen. 
+			
+			System.out.println(System.identityHashCode( petrigraph ));
+			
+		}
+		
+		if (ae.getSource() == gui.neu_laden) {
+			petrigraph = gui.reopen(petrigraph);
+			this.knotlist = gui.getKnotList();
+			this.arclist = gui.getArcList();
+			this.petrinet = new PetriNet(this.knotlist, this.arclist);
+			
+			petrigraph.loadGraph(this.knotlist, this.arclist);
+			petrigraph.changeGraph(this.knotlist);
+			
+			this.ernet = this.petrinet.getERNet();
+			this.ergraph.addKnot(this.ernet.getERknotlist(), this.ernet.getERArclist());
+			
+		}
+		
+		if (ae.getSource() == gui.analyse_ALL) {
+			xmlfiles = gui.analyse_ALL();
+			Analyse analyse = new Analyse (xmlfiles, gui.textarea);
+			analyse.analyse_ALL();
+		}
+		
+		if (ae.getSource() == gui.beenden) {
+			gui.exit();
+		}
+		
+		if (ae.getSource() == gui.schalten){
+			System.out.println("Die Taste 'Schalten' wurde betätigt");					//Besser mit while Schleife lösen!!!
+			for (int i = 0; i < this.petrinet.getTransitionlist().size() ; i++) {
+				if (this.petrinet.getTransitionlist().get(i).getSelection() == true) {
+					this.petrinet.firing(this.petrinet.getTransitionlist().get(i).getId());
+					this.ernet.insert_knot(this.petrinet.getMarking(), this.petrinet.getFormer_Marking(), this.petrinet.getTransitionlist().get(i).getId());
+					this.ergraph.addKnot(this.ernet.getERknotlist(), this.ernet.getERArclist());
+				}
+			}
+			this.petrigraph.changeGraph(this.petrinet.getKnotlist());
+		}
+		
+		if (ae.getSource() == gui.analyse_ONE) {
+			String outputString;
+			this.petrigraph = gui.reopen(this.petrigraph);
+			Analyse analyse = new Analyse(this.xmlfile , gui.textarea);
+			if (analyse.analyse_ONE() == true) {
+				outputString = this.xmlfile.getName() + " - der  zugehörige Erreichbarkeitsgraph ist beschränkt";
+				gui.textarea.append(outputString);
+			}
+			else {
+				outputString = this.xmlfile.getName() + " - der dazugehörige Erreichbarkeitsgraph ist unbeschränkt";
+				gui.textarea.append(outputString);
+			}
+			gui.showResult(outputString);
+			this.ernet = analyse.getERNet();
+			this.ergraph.addKnot(ernet.getERknotlist(), ernet.getERArclist());
+		}
+		
+
+		
+	}
+	
+	
+	public void viewClosed( String id ) {
+		
+	}
+	
+	public void buttonPushed( String id ) {
+		System.out.println("ButtonPushedTest");
+		for (int i = 0; i < this.petrinet.getKnotlist().size(); i++) {
+			if (this.petrigraph.getNode(id).getAttribute("id").toString().equals(this.petrinet.getKnotlist().get(i).getId())) {
+				System.out.println(this.petrigraph.getNode(id).getAttribute("id").toString());
+				System.out.println(this.petrinet.getKnotlist().get(i).getId());
+				System.out.println("PushedButtonTest II");
+				this.petrinet.changeSelection(this.petrinet.getKnotlist().get(i).getId());
+				System.out.println(this.petrinet.getKnotlist().get(i).getId());
+			}
+		}
+		this.petrigraph.changeGraph(this.petrinet.getKnotlist());
+		
+	}
+	
+	public void buttonReleased( String id ) {
+		
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent me) {
+		
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent me) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent me) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent me) {
+		if (gui != null) {
+			gui.pump();
+		}
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent me) {
+		if (gui != null)	{
+			gui.pump();
+		}
+	}
+	
+	
+	public void testprint() {
+		
+	}
+	
+	public static void main (String args[]) {
+		
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				Control control = new Control();
+			}
+		});
+		
+	}
+
+	
+	
+	
+}

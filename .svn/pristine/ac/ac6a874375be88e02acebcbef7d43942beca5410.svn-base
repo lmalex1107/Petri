@@ -1,0 +1,28 @@
+package view;
+
+import java.awt.BorderLayout;
+import java.util.ArrayList;
+
+import javax.swing.JPanel;
+
+import model.Arc;
+import model.Knot;
+
+public class GraphPanel extends JPanel{
+	
+	PetriGraph petrigraph;
+	public PetriPanel petripanel;
+	
+	public GraphPanel(PetriGraph petrigraph) {
+		this.petrigraph = petrigraph;
+		petripanel = new PetriPanel(this.petrigraph);
+		this.add(petripanel, BorderLayout.WEST);
+		
+	}
+	
+	public void setPetriGraph(PetriGraph petrigraph) {
+		this.petrigraph = petrigraph;
+		petripanel.showGraph(this.petrigraph);
+		
+	}
+}

@@ -1,0 +1,51 @@
+package view;
+import java.awt.BorderLayout;
+import java.awt.Graphics;
+
+import javax.swing.JPanel;
+
+import org.graphstream.graph.Node;
+import org.graphstream.ui.swingViewer.ViewPanel;
+import org.graphstream.ui.view.View;
+import org.graphstream.ui.view.Viewer;
+import org.graphstream.ui.view.ViewerPipe;
+
+public class PetriPanel extends JPanel{
+	PetriGraph petrigraph;
+	ViewerPipe viewerpipe;
+	Viewer viewer;
+	ViewPanel viewpanel;
+
+	public PetriPanel (PetriGraph petrigraph) {
+		this.setLayout(new BorderLayout());
+		this.petrigraph = petrigraph;
+		
+		//Node nodeA = petrigraph.add("nodeA");
+		//nodeA.addAttribute("ui.label", "A");
+		//nodeA.addAttribute("xy", 100, 50);
+		
+		
+		
+		System.out.println("PetriPanelTest");
+		
+		viewer = new Viewer(petrigraph, Viewer.ThreadingModel.GRAPH_IN_ANOTHER_THREAD);
+		viewer.disableAutoLayout();
+		viewpanel = viewer.addDefaultView(false);
+		viewerpipe = viewer.newViewerPipe();
+		this.add(viewpanel, BorderLayout.CENTER);
+	}
+	
+	public void showGraph(PetriGraph petrigraph) {
+		this.petrigraph = petrigraph;
+		viewerpipe.pump();
+		
+	}	
+			
+		
+
+		
+		
+	
+	
+	
+}

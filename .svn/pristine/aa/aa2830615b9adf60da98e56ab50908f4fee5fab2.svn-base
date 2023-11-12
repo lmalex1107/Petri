@@ -1,0 +1,39 @@
+package view;
+
+import java.util.ArrayList;
+
+import org.graphstream.graph.implementations.MultiGraph;
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Node;
+
+import model.Arc;
+import model.ERKnot;
+import model.Knot;
+
+public class Erreichbarkeitsgraph extends MultiGraph{
+	
+	private static String CSS_FILE = "url(" + PetriGraph.class.getResource("/graph.css") + ")";
+	
+	ArrayList<Knot>ernodelist = null;
+	ArrayList<Arc>erarclist = null;
+
+	public Erreichbarkeitsgraph() {
+		super("");
+		
+	}
+	
+	public void addKnot (ArrayList<ERKnot> erknotlist) {
+		//for (int i = 0; i < ERKnotlist.size(); i++) {
+			
+		//}
+		
+		this.clear(); //nur zum Testen; eigentlich soll ERGraph nicht jedesmal komplett neue erstellt werden.
+		this.addAttribute("ui.stylesheet", CSS_FILE);
+		for (int i = 0; i < erknotlist.size(); i++) {
+			Node node = this.addNode(erknotlist.get(i).getLabel());
+			node.addAttribute("ui.label", erknotlist.get(i).getLabel());
+		}
+		
+	}
+	
+}

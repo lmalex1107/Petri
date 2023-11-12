@@ -1,0 +1,159 @@
+package model;
+
+import java.util.ArrayList;
+
+public class Erreichbarkeitsnet {
+	ArrayList<ERKnot> erknotlist;
+	ERKnot firstERKnot;
+	ERKnot actual_ERKnot;
+	
+	
+	
+	public Erreichbarkeitsnet (int[] startmarking) {
+		erknotlist = new ArrayList<ERKnot> ();
+		firstERKnot = new ERKnot(startmarking);
+		erknotlist.add(firstERKnot);
+		System.out.println("First-Test");
+		testprint();
+	}
+	
+	public ArrayList<ERKnot> getERknotlist() {
+		return this.erknotlist;
+	}
+	
+	
+	
+	public void insert_knot2(int[] Marking, int[] ERSuccessor, String TransitionID) {				//Test, ob alle Knoten eingetragen werden.
+		String current_label = ERKnot.MarkingToString(Marking);
+		String former_label = ERKnot.MarkingToString(ERSuccessor);
+		if (find(current_label) == null) {										//Knoten noch nicht vorhanden - einfügen
+			ERKnot erknot = new ERKnot(Marking);
+			
+			
+			if (find(former_label) != null) {
+				erknot.setSuccesor(find(former_label));
+				find(former_label).setPredecessor(erknot);						//Vorgänger, Nachfolger eintragen
+				
+			}
+			erknotlist.add(erknot);
+			System.out.println("Knoten zum ersten Mal aufgetaucht.");
+		}
+		testprint();
+	}
+	
+	/**
+	 * In der Methode 'insert_knot ('Knoten einfügen') wird eine Liste von Markierungen zur Bildung eines neuen Knotens übergeben.
+	 * Die zweite Markierungsliste zeigt an, an welcher Stelle, also an welchen Vorgänger-Knoten, 
+	 * der neue Knoten angefügt wird. Außerdem gibt eine ID an, welcher Transitor im zugehörigen Petri-
+	 * Netz geschaltet wurde.
+	 * @param ERKnot
+	 * @param ERSuccessor
+	 * @param TransitionID
+	 */
+	public void insert_knot(int[] Marking, int[] ERSuccessor, String TransitionID) {	//überarbeiten!!!
+		String current_label = ERKnot.MarkingToString(Marking);
+		String former_label = ERKnot.MarkingToString(ERSuccessor);
+		
+		if (find(current_label) == null) {										//Knoten noch nicht vorhanden - einfügen
+			ERKnot erknot = new ERKnot(Marking);
+			
+			
+			if (find(former_label) != null) {
+				erknot.setSuccesor(find(former_label));
+				find(former_label).setPredecessor(erknot);						//Vorgänger, Nachfolger eintragen
+				
+			}
+			erknotlist.add(erknot);
+			System.out.println("Knoten zum ersten Mal aufgetaucht.");
+		}
+		else {																	//Wenn Knoten bereits vorhanden...
+			System.out.println("Knoten bereits vorhanden.");
+			if (find(former_label) != null) {
+				boolean found = false;
+				int i = 0;
+				do {
+					if (find(current_label).getSuccessor().size() > 0) {					//Dieser Teil soll Duplikate ausschließen.
+						if (find(current_label).getSuccessor().get(i).getLabel().equals(former_label)) {
+							found = true;
+							System.out.println("Auch Vorgänger-Knoten schon vorhanden.");
+						}
+						else {
+							i++;
+						}
+					}
+					
+					
+				}
+				while ((found == false) && (i < find(current_label).getSuccessor().size()));
+				if (found == false) {
+					find(current_label).setSuccesor(find(former_label));
+					find(former_label).setPredecessor(find(current_label));
+				}
+			}
+			
+		}
+		
+		
+		testprint();
+		
+	}
+	
+	
+	
+	private ERKnot find (String label) {
+		ERKnot erknot = null;
+		boolean found = false;
+		int i = 0;
+		do {
+			if (this.erknotlist.get(i).getLabel().equals(label)) {
+				found = true;
+				erknot = this.erknotlist.get(i);
+			}
+			else {
+				i++;
+			}
+		}
+		while ((found == false) && (i < this.erknotlist.size()));
+		
+		
+		return erknot;
+	}
+	
+	/**
+	 * Die nachfolgende Methode überprüft, ob der Knoten bereits vorhanden ist
+	 * und aktualisiert die vorhandenen Verbindungen zu ebendiesem Knoten.
+	 */
+	private void complete_connections() {
+		
+	}
+	
+	/**
+	 * Das Herzstück der Klasse und des gesamten Programmes. Hierin wird überprüft, ob
+	 * der Erreichbarkeitsgraph enlich ist oder nicht.
+	 * @return
+	 */
+	public boolean isInfinity() {
+		boolean finite = false;
+		
+		
+		return finite;
+	}
+	
+	public void testprint () {
+		System.out.println("");
+		System.out.println("aktueller Erreichbarkeitsgraph: ");
+		for (int i = 0; i < this.erknotlist.size(); i++) {
+			System.out.println(this.erknotlist.get(i).getLabel());
+			if (this.erknotlist.get(i).getSuccessor().size() > 0) {
+				System.out.println("VORGÄNGER ");
+				for (int j = 0; j < this.erknotlist.get(i).getSuccessor().size(); j++) {
+					System.out.println("   " + this.erknotlist.get(i).getSuccessor().get(j).getLabel());
+				}
+			}
+			
+			
+		}
+		System.out.println("");
+	}
+	
+}

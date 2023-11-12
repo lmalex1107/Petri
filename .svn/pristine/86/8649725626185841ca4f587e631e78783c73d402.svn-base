@@ -1,0 +1,33 @@
+package model;
+
+import java.util.ArrayList;
+
+public class ERKnot {
+
+	private int[] Marking;
+	private String id;
+	private ArrayList<ERKnot> predecessor = null;
+	private ArrayList<ERKnot> successor = null;
+	
+	public ERKnot(int[] Marking) {
+		this.Marking = Marking;
+		predecessor = new ArrayList<ERKnot>();
+		successor = new ArrayList<ERKnot>();
+	}
+	
+	public void setPredecessor(ERKnot erknot) {
+		this.predecessor.add(erknot);
+	}
+	
+	public ArrayList<ERKnot> getPredecessor(){
+		return this.predecessor;
+	}
+	
+	public void setSuccesor(ERKnot erknot) {
+		this.successor.add(erknot);
+	}
+	
+	public ArrayList<ERKnot> getSuccessor(){
+		return this.successor;
+	}
+}
